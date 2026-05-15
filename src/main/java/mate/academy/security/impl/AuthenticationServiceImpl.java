@@ -19,9 +19,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public User login(String email, String password) throws AuthenticationException {
         Optional<User> userFromObOptional = userService.findByEmail(email);
-        User user = userFromObOptional.get();
+        User user = userFromObOptional
+                .orElseThrow(() -> new AuthenticationException("User not found"));
         String hashedPassword = HashUtil.hashPassword(password, user.getSalt());
-        if (hashedPassword.equals(user.getPassword()) && userFromObOptional.isPresent()) {
+        if (hashedPassword.equals(user.getPassword())) {
             return user;
         }
         throw new AuthenticationException("Invalid password");
